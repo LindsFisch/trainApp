@@ -26,18 +26,19 @@ var minsAway = 0;
 database.ref().on("child_added", function(childsnapshot) {
   var child = childsnapshot.val();
 
-nextArrival = (moment(child.dataStart).diff(moment(),"months"))*-1;
+//nextArrival = (moment(child.dataStart).diff(moment(),"months"))*-1;
+//nextArrival = (moment(child.dataTime))
 
-minsAway = worked * child.dataRate;
-
+//minsAway = worked * child.dataRate;
+//minsAway = ()
 
   var table = $("<tr class = 'table'>");
   $("#table").append(table);
   table.append("<td>" + child.dataName + "</td>");
   table.append("<td>" + child.dataDest + "</td>");
   table.append("<td>" + child.dataFreq + "</td>");
-  table.append("<td>" + nextArrival + "</td>");
-  table.append("<td>" + minsAway + "</td>");
+  table.append("<td>" + child.dataArriv + "</td>");
+  table.append("<td>" + child.dataMins + "</td>");
 
 
   }, function(error) {
@@ -54,16 +55,22 @@ $("#submit").on("click", function() {
 		firstTrain = $("#time-input").val().trim();
 		frequency = parseInt($("#freq-input").val().trim());
 
-nextArrival = (moment(start).diff(moment(),"months"))*-1;
-minsAway = month * rate;
+var timeconvert = moment(firstTrain, "HH:mm").subtract(1, "years");
+var difference = moment().diff(moment(timeconvert),"minutes");
+var remain = difference % frequency;
+minsAway = frequency - remain;
+var nextTrain = moment().add(minsAway, "mins");
+nextArrival = moment(nextTrain).format("hh:mm");
+//nextArrival = (moment(start).diff(moment(),"months"))*-1;
+//minsAway = month * rate;
 
-  var table = $("<tr class = 'table'>");
-  $("#table").append(table);
-  table.append("<td>" + name + "</td>");
-  table.append("<td>" + destination + "</td>");
-  table.append("<td>" + frequency + "</td>");
-  table.append("<td>" + nextArrival + "</td>");
-  table.append("<td>" + minsAway + "</td>");
+  // var table = $("<tr class = 'table'>");
+  // $("#table").append(table);
+  // table.append("<td>" + name + "</td>");
+  // table.append("<td>" + destination + "</td>");
+  // table.append("<td>" + frequency + "</td>");
+  // table.append("<td>" + nextArrival + "</td>");
+  // table.append("<td>" + minsAway + "</td>");
 
 
 	database.ref().push({
@@ -71,10 +78,12 @@ minsAway = month * rate;
       dataDest: destination,
       dataTime: firstTrain,
       dataFreq: frequency,
+      dataMins: minsAway,
+      dataArriv: nextArrival,
     })
 
   //empty after submit
-  $("#name-input").val("");
+  $("#train-input").val("");
   $("#destination-input").val("");
   $("#time-input").val("");
   $("#freq-input").val("");
